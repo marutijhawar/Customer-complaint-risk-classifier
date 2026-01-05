@@ -1,0 +1,85 @@
+# Configuration for Customer Complaint Risk Classifier
+
+data:
+  raw_path: "data/raw/complaints.csv"
+  processed_path: "data/processed/complaints_processed.csv"
+  text_column: "complaint_narrative"
+  target_column: "risk_level"
+  test_size: 0.2
+  random_state: 42
+
+preprocessing:
+  min_text_length: 10
+  max_text_length: 5000
+  remove_urls: true
+  remove_emails: true
+  remove_phone_numbers: true
+  lowercase: true
+  remove_punctuation: true
+  remove_numbers: false
+  lemmatize: false
+  remove_stopwords: true
+
+features:
+  tfidf:
+    max_features: 200
+    ngram_range: [1, 1]
+    min_df: 2
+    max_df: 0.90
+
+  sentiment:
+    include_vader: true
+    include_textblob: false
+
+  text_stats:
+    include_length: true
+    include_word_count: true
+    include_avg_word_length: true
+    include_sentence_count: true
+    include_exclamation_count: true
+    include_question_count: true
+    include_caps_ratio: true
+
+models:
+  logistic_regression:
+    C: [1]
+    class_weight: "balanced"
+    max_iter: 300
+
+  random_forest:
+    n_estimators: [30]
+    max_depth: [8]
+    class_weight: "balanced"
+
+  xgboost:
+    n_estimators: [30]
+    max_depth: [3]
+    learning_rate: [0.1]
+    scale_pos_weight: "auto"
+
+  svm:
+    C: [0.5]
+    kernel: "linear"
+    class_weight: "balanced"
+
+evaluation:
+  cv_folds: 3
+  scoring: "recall"
+  high_risk_threshold: 0.3
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+
+risk_labels:
+  0: "Low"
+  1: "Medium"
+  2: "High"
+
+business:
+  avg_customer_value: 5000
+  churn_cost_multiplier: 3
+  escalation_cost: 500
+  regulatory_fine_risk: 50000
